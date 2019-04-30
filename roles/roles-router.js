@@ -19,13 +19,16 @@ router.get('/', (req, res) => {
 
 router.get('/:id', (req, res) => {
     // retrieve a role by id
-    res.send('Write code to retrieve a role by id');
+    db('roles')
+        .where({ id: req.params.id })
+        .then(role => res.status(200).json(role[0]))
+        .catch(err => res.status(500).json(err));
 });
 
 router.post('/', (req, res) => {
     // add a role to the database
     db('roles')
-        .insert(req.body, ['name'])
+        .insert(req.body, 'id')
         .then(results => res.status(200).json(results))
         .catch(err => res.status(500).json(err));
 });
