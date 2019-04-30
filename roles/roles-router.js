@@ -19,9 +19,16 @@ router.get('/', (req, res) => {
 
 router.get('/:id', (req, res) => {
     // retrieve a role by id
+    const message404 = { message: 'Role not found' }
+
     db('roles')
         .where({ id: req.params.id })
-        .then(role => res.status(200).json(role[0]))
+        .first()
+        .then(role => {
+            role === undefined
+                ? res.status(404).json(message404)
+                : res.status(200).json(role)
+        })
         .catch(err => res.status(500).json(err));
 });
 
