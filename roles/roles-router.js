@@ -11,14 +11,12 @@ const knexConfig = {
 const db = knex(knexConfig);
 
 router.get('/', (req, res) => {
-    // return all roles from the database
     db('roles')
         .then(roles => res.status(200).json(roles))
         .catch(err => console.log(err));
 });
 
 router.get('/:id', (req, res) => {
-    // retrieve a role by id
     const message404 = { message: 'Role not found' }
 
     db('roles')
@@ -33,7 +31,6 @@ router.get('/:id', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-    // add a role to the database
     db('roles')
         .insert(req.body, 'id')
         .then(results => res.status(200).json(results))
@@ -41,13 +38,39 @@ router.post('/', (req, res) => {
 });
 
 router.put('/:id', (req, res) => {
-    // update roles
-    res.send('Write code to modify a role');
+    db('roles')
+        .where({ id: req.params.id })
+        .update(req.body)
+        .then(count => {
+            if (count > 0) {
+                res.status(200).json({
+                    message: `${count} ${count > 1 ? 'records' : 'record'} updated`,
+                });
+            } else {
+                res.status(404).json({ message: 'Role does not exist' });
+            }
+        })
+        .catch(err => {
+            res.status(500).json(err);
+        });
 });
 
 router.delete('/:id', (req, res) => {
-    // remove roles (inactivate the role)
-    res.send('Write code to remove a role');
+    db('roles')
+        .where({ id: req.params.id })
+        .del()
+        .then(count => {
+            if (count > 0) {
+                res.status(200).json({
+                    message: `${count} ${count > 1 ? 'records' : 'record'} deleted`,
+                });
+            } else {
+                res.status(404).json({ message: 'Role does not exist' });
+            }
+        })
+        .catch(err => {
+            res.status(500).json(err);
+        });
 });
 
 module.exports = router;
